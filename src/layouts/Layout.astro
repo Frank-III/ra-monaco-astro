@@ -1,6 +1,6 @@
 ---
 interface Props {
-	title: string;
+  title: string;
 }
 
 const { title } = Astro.props;
@@ -8,43 +8,54 @@ const { title } = Astro.props;
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Astro description" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <nav class="bg-gray-800 shadow-lg">
+      <div class="w-full mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-white">
+              <img
+                class="h-8 w-16"
+                src={"/rust-analyzer.svg"}
+                alt="Rust Analyzer Logo"
+              />
+            </div>
+            <div class="ml-4">
+              <span class="text-white text-lg font-semibold"
+                >Rust Playground</span
+              >
+              <span class="text-gray-400 text-sm ml-2">(Unofficial)</span>
+            </div>
+          </div>
+          <div class="flex items-center">
+            <a
+              href="https://github.com/rust-lang/rust-analyzer"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://rust-analyzer.github.io/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+            >
+              Docs
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <slot />
+  </body>
 </html>
-<style is:global>
-	:root {
-		--accent: 136, 58, 234;
-		--accent-light: 224, 204, 250;
-		--accent-dark: 49, 10, 101;
-		--accent-gradient: linear-gradient(
-			45deg,
-			rgb(var(--accent)),
-			rgb(var(--accent-light)) 30%,
-			white 60%
-		);
-	}
-	html {
-		font-family: system-ui, sans-serif;
-		background: #13151a;
-	}
-	code {
-		font-family:
-			Menlo,
-			Monaco,
-			Lucida Console,
-			Liberation Mono,
-			DejaVu Sans Mono,
-			Bitstream Vera Sans Mono,
-			Courier New,
-			monospace;
-	}
-</style>
