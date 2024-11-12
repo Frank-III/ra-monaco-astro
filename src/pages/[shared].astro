@@ -1,0 +1,25 @@
+---
+import { db, CodeSnippet, eq } from "astro:db";
+import Layout from "../layouts/Layout.astro";
+import Monaco from "../components/Monaco.svelte";
+
+Astro.response.headers.set("Cross-Origin-Opener-Policy", "same-origin");
+Astro.response.headers.set("Cross-Origin-Embedder-Policy", "require-corp");
+Astro.response.headers.set("Cross-Origin-Resource-Policy", "cross-origin");
+const { shared } = Astro.params;
+const sharedCode = await db
+  .select()
+  .from(CodeSnippet)
+  .where(eq(CodeSnippet.id, shared))
+  .then(([snippet]) => snippet);
+
+if (!sharedCode) {
+  return Astro.redirect("/404"); // Make sure you have a 404 page
+}
+---
+
+<Layout title={`Rust Analyzer Playground`}>
+  <main>
+    <Monaco client:only code={sharedCode.code} />
+  </main>
+</Layout>

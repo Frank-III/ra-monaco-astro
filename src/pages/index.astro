@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Monaco from "../components/Monaco.svelte";
+import exampleCode from "../lib/example-code.rs?raw";
 Astro.response.headers.set("Cross-Origin-Opener-Policy", "same-origin");
 Astro.response.headers.set("Cross-Origin-Embedder-Policy", "require-corp");
 Astro.response.headers.set("Cross-Origin-Resource-Policy", "cross-origin");
@@ -8,6 +9,6 @@ Astro.response.headers.set("Cross-Origin-Resource-Policy", "cross-origin");
 
 <Layout title="Rust Analyzer Playground">
   <main>
-    <Monaco client:only />
+    <Monaco code={exampleCode} client:only="svelte" />
   </main>
 </Layout>
