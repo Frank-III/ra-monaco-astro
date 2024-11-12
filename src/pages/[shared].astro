@@ -10,7 +10,7 @@ const { shared } = Astro.params;
 const sharedCode = await db
   .select()
   .from(CodeSnippet)
-  .where(eq(CodeSnippet.id, shared))
+  .where(eq(CodeSnippet.id, shared!))
   .then(([snippet]) => snippet);
 
 if (!sharedCode) {
