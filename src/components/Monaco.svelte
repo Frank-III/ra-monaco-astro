@@ -2,7 +2,7 @@
   import { onDestroy, onMount, tick } from "svelte";
   import type * as Monaco from "monaco-editor/esm/vs/editor/editor.api";
   import { type WorldState } from "../lib/wasm_demo/wasm_demo";
-  import exampleCode from "../lib/example-code.rs?raw";
+  // import exampleCode from "../lib/example-code.rs?raw";
   import fake_std from "../lib/fake_std.rs?raw";
   import fake_core from "../lib/fake_core.rs?raw";
   import fake_alloc from "../lib/fake_alloc.rs?raw";
@@ -11,6 +11,7 @@
   import { AnsiUp } from "ansi_up";
   import { Interpreter } from "../lib/interpreter";
   import { ConsoleStore } from "./console.svelte";
+  let { code }: { code: string } = $props();
   let isAnalyzing = $state(false);
   let isLoading = $state(true);
   let isExecuting = $state(false);
@@ -117,7 +118,8 @@
     };
 
     // Create the editor instance
-    const model = monaco.editor.createModel(exampleCode, modeId);
+    // const model = monaco.editor.createModel(code, modeId);
+    const model = monaco.editor.createModel(code, modeId);
 
     initRA();
     editor = monaco.editor.create(editorContainer, {
@@ -381,6 +383,19 @@
     const code = editor.getValue();
     await interpreter.run(code);
   }
+
+  async function shareCode() {
+    const data = await fetch("/api/share", {
+      method: "POST",
+      body: JSON.stringify({ code: editor.getValue() }),
+    })
+      .then((res) => res.json())
+      .catch((e) => {
+        console.error("error: ", e);
+      });
+    console.log("data: ", data);
+    return data;
+  }
 </script>
 
 <svelte:window on:resize={() => editor.layout()} />
@@ -394,7 +409,7 @@
 
   <div class="h-full flex flex-col">
     <div
-      class="bg-gray-800 border-b border-gray-700 p-2 flex items-center gap-2"
+      class="bg-gray-800 border-b border-gray-700 p-2 flex items-center gap-2 justify-end"
     >
       <button
         class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded-md text-sm font-medium disabled:opacity-50"
@@ -406,6 +421,12 @@
         {:else}
           Run ▶
         {/if}
+      </button>
+      <button
+        class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-1 rounded-md text-sm font-medium"
+        onclick={shareCode}
+      >
+        Share
       </button>
     </div>
 
