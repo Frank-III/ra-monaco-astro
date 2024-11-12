@@ -15,6 +15,8 @@
   let isAnalyzing = $state(false);
   let isLoading = $state(true);
   let isExecuting = $state(false);
+  let isSharing = $state(false);
+  let showCopiedNotification = $state(false);
   let editorContainer: HTMLElement;
   let editor: Monaco.editor.IStandaloneCodeEditor;
   let state_: WorldState;
@@ -385,16 +387,41 @@
   }
 
   async function shareCode() {
-    const data = await fetch("/api/share", {
-      method: "POST",
-      body: JSON.stringify({ code: editor.getValue() }),
-    })
-      .then((res) => res.json())
-      .catch((e) => {
-        console.error("error: ", e);
+    if (isSharing) return;
+
+    try {
+      isSharing = true;
+      const code = editor.getValue();
+      const response = await fetch("/api/share", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code }),
       });
-    console.log("data: ", data);
-    return data;
+
+      const result = await response.json();
+      if (result.success) {
+        // Create the full URL
+        const shareUrl = `${window.location.origin}/${result.data.id}`;
+
+        // Copy to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+
+        // Show notification
+        showCopiedNotification = true;
+        setTimeout(() => {
+          showCopiedNotification = false;
+        }, 3000); // Hide after 3 seconds
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error("Failed to share code:", error);
+      // Handle error
+    } finally {
+      isSharing = false;
+    }
   }
 </script>
 
@@ -422,12 +449,23 @@
           Run ▶
         {/if}
       </button>
-      <button
-        class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-1 rounded-md text-sm font-medium"
-        onclick={shareCode}
-      >
-        Share
-      </button>
+      <div class="relative">
+        <button
+          class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-1 rounded-md text-sm font-medium disabled:opacity-50"
+          onclick={shareCode}
+          disabled={isSharing}
+        >
+          {isSharing ? "Sharing..." : "Share"}
+        </button>
+
+        {#if showCopiedNotification}
+          <div
+            class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-900 text-white text-sm rounded shadow-lg"
+          >
+            URL copied to clipboard!
+          </div>
+        {/if}
+      </div>
     </div>
 
     <!-- Editor Container -->
@@ -516,4 +554,18 @@
       transform: rotate(360deg);
     }
   } /* Include any additional styles */
+  div :global(.absolute) {
+    animation: fadeIn 0.2s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 10px);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
 </style>
