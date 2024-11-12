@@ -5,8 +5,8 @@ export const POST: APIRoute = async ({ params, request }) => {
   try {
     const { code } = await request.json();
     const id = Math.random().toString(36).substring(2, 15);
-    console.log("id: ", id);
-    console.log("code: ", code);
+    // console.log("id: ", id);
+    // console.log("code: ", code);
     const result = await db
       .insert(CodeSnippet)
       .values({
